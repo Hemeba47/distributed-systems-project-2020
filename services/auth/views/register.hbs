@@ -1,0 +1,36 @@
+<style>
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    html {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+<html>
+<h1>Login Service</h1>
+<form method="POST" action="http://localhost:5001/register">
+    <label for="firstName">first name</label>
+    <input name="firstName" id="firstName" value="" type="text" />
+    <label for="lastName">last name</label>
+    <input name="lastName" id="lastName" value="" type="text" />
+    <label for="email">email</label>
+    <input name="email" id="email" value="" type="email" />
+    <label for="password">password</label>
+    <input name="password" id="password" type="password" value="" />
+    <label for="service">service</label>
+    <button type="submit">login</button>
+</form>
+
+<a href="/login">login</a>
+</div>
+
+</html>
+<script>
+
+    var s = new URLSearchParams(location.search).get('service')
+    document.querySelector('#service').value = s; 
+</script>

@@ -1,0 +1,39 @@
+<style>
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    html {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+<html>
+<h1>Login Service</h1>
+<form method="POST" action="http://localhost:5001/login">
+    <label for="email">email</label>
+    <input name="email" id="email" value="toni@dev.io" type="email" />
+    <label for="password">password</label>
+    <input name="password" id="password" type="password" value="password" />
+
+    <label for="service">service</label>
+    <select selected="" name="service" id="service" type="text">
+        <option value="">select a service</option>
+        <option value="notebook">chat</option>
+        <option value="profile">manage profile</option>
+    </select>
+    <button type="submit">login</button>
+</form>
+
+<a href="/register">Register</a>
+<a href="/change-password">Change Password</a>
+</div>
+
+</html>
+<script>
+
+    var s = new URLSearchParams(location.search).get('service')
+    document.querySelector('#service').value = s; 
+</script>

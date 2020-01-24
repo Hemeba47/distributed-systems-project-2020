@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  chat:
+    build: ./services/chat
+    ports:
+      - "5000:3000"
+    depends_on:
+      - postgres
+    environment:
+      SERVICE_NAME: "chat"
+      SERVICE_PORT: 3000
+    volumes:
+      - ./services/chat/src:/etc/chat/src
+      - ./services/chat/views:/etc/chat/views
+      - ./services/chat/ormconfig.json:/etc/chat/ormconfig.json
+  auth:
+    build: ./services/auth
+    ports:
+      - "5001:3000"
+    depends_on:
+      - postgres
+    environment:
+      SERVICE_NAME: "auth"
+      SERVICE_PORT: 3000
+    volumes:
+      - ./services/auth/src:/etc/auth/src
+      - ./services/auth/views:/etc/auth/views
+      - ./services/auth/ormconfig.json:/etc/auth/ormconfig.json
+  redis:
+    image: "redis:alpine"
+
+  postgres:
+    image: "postgres:9.6.1"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "test"
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "test"

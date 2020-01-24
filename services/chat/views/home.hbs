@@ -1,0 +1,65 @@
+<nav>
+
+    <a href="http://localhost:5000">home</a>
+    <a href="http://localhost:5000/logout">logout</a>
+</nav>
+<style>
+    ul,
+    li {
+        list-style: none;
+        font-weight: bold;
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .messages {
+        flex-grow: 1;
+        background: #344534;
+        color: white;
+        padding-left: 5px;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .input {
+        flex-grow: 1;
+    }
+</style>
+
+
+<body class="body">
+    <nav>logged in as: {{firstName}} {{lastName}}, {{email}}</nav>
+    <div id="messages" class="messages">
+    </div>
+    <form class="form" action="">
+        <input id="message-input" class="input" name="note" type="text" value="{{note}}">
+        <input type="submit" value="send" />
+    </form>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+
+    $(function () {
+        var socket = io("?name={{firstName}}");
+        const form = document.querySelector('.form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.querySelector('#message-input');
+            const message = input.value;
+            input.value = "";
+            socket.emit('chat', message);
+        })
+        socket.on('chat', function (msg) {
+            $('#messages').append($('<li>').text(msg));
+        });
+    });
+</script>

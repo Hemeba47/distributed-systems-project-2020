@@ -1,0 +1,25 @@
+{
+  "name": "new-typeorm-project",
+  "version": "0.0.1",
+  "description": "Awesome project developed with TypeORM.",
+  "devDependencies": {
+    "ts-node": "3.3.0",
+    "@types/node": "^8.0.29",
+    "typescript": "3.3.3333"
+  },
+  "dependencies": {
+    "axios": "^0.19.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.1",
+    "express": "^4.15.4",
+    "express-handlebars": "^3.1.0",
+    "handlebars": "^4.7.2",
+    "hbs": "^4.1.0",
+    "pg": "^7.3.0",
+    "reflect-metadata": "^0.1.10",
+    "typeorm": "0.2.21"
+  },
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  }
+}
