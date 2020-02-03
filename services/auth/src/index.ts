@@ -6,11 +6,25 @@ import { Request, Response } from "express";
 import { Routes } from "./routes";
 import { User } from "./entity/User";
 import * as bcrypt from "bcryptjs";
+import * as amqp from "amqplib";
 
 const exphbs = require("express-handlebars");
 
 createConnection()
   .then(async connection => {
+    /* RABBIT MQ MESSAGE PUBLISH */
+    const rabbitmqConnection = await amqp.connect("amqp://rabbitmq");
+
+    const channel = await rabbitmqConnection.createChannel();
+    var queue = "logging";
+    var msg = "logginservice started";
+
+    channel.assertQueue(queue, {
+      durable: false
+    });
+
+    channel.sendToQueue(queue, Buffer.from(msg));
+
     // create express app
     const app = express();
     app.engine("handlebars", exphbs());
