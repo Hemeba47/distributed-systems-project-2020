@@ -26,6 +26,17 @@ services:
       - ./services/auth/src:/etc/auth/src
       - ./services/auth/views:/etc/auth/views
       - ./services/auth/ormconfig.json:/etc/auth/ormconfig.json
+  logging:
+    build: ./services/logging
+    ports:
+      - "5002:3000"
+    depends_on:
+      - postgres
+    environment:
+      SERVICE_NAME: "logging"
+      SERVICE_PORT: 3000
+    volumes:
+      - ./services/logging/src:/etc/logging/src
   redis:
     image: "redis:alpine"
 

@@ -18,8 +18,8 @@ createConnection()
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
-    app.get("/", (req: Request, res: Response, next: Function) => {
-      return res.render("login.hbs");
+    app.get("/", (req: Request, response: Response, next: Function) => {
+      return response.render("login.hbs");
     });
 
     app.get("/login", (req: Request, res: Response, next: Function) => {
@@ -40,7 +40,7 @@ createConnection()
           return res.sendStatus(401);
         }
 
-        if (req.body.service === "notebook") {
+        if (req.body.service === "chat") {
           return res.redirect(
             `http://localhost:5000/login-success?user=${encodeURIComponent(
               JSON.stringify(user)
@@ -55,7 +55,8 @@ createConnection()
           );
         }
       }
-      return res.sendStatus(401);
+
+      return res.json(user);
     });
 
     app.get("/register", (req: Request, res: Response, next: Function) => {

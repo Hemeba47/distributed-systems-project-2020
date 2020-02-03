@@ -4,6 +4,7 @@ import * as bodyParser from "body-parser";
 import * as session from "express-session";
 import { Request, Response } from "express";
 import * as redis from "redis";
+import { Message } from "./entity/Message";
 
 const exphbs = require("express-handlebars");
 const RedisStore = require("connect-redis")(session);
@@ -53,7 +54,7 @@ createConnection()
         return next();
       }
       return res.redirect(
-        "http://localhost:5001/login?service=notebook&token=safdasdhflsadkfasdf"
+        "http://localhost:5001/login?service=chat&token=safdasdhflsadkfasdf"
       );
     });
 
@@ -100,15 +101,24 @@ createConnection()
     // Do web socket magic here
     io.on("connection", socket => {
       const name = socket.handshake.query.name;
-      console.log(`${name}  connected`);
+      const userId = socket.handshake.query.userId;
+      console.log(`${userId} of ${name}  connected`);
       io.emit(
         "chat",
         `${new Date().toUTCString()}::${name}: connected to chat`
       );
 
-      socket.on("chat", function(msg) {
+      socket.on("chat", async function(msg) {
         console.log("message: " + msg);
+        console.log("here we would save the message aswell ");
         io.emit("chat", `${new Date().toUTCString()}::${name}: ${msg}`);
+
+        const notSavedMessage = new Message();
+        notSavedMessage.content = msg;
+        notSavedMessage.userId = Number(userId);
+        const savedMessage = await getRepository(Message).save(notSavedMessage);
+
+        console.log(savedMessage);
       });
 
       socket.on("disconnect", function() {
