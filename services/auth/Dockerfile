@@ -1,5 +1,6 @@
 FROM node:10-alpine
 
+RUN apk add curl
 RUN npm install -g typescript ts-node ts-node-dev 
 
 WORKDIR /etc/auth

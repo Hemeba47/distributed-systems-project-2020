@@ -2,10 +2,12 @@ version: "3.7"
 services:
   chat:
     build: ./services/chat
+    restart: always
     ports:
       - "5000:3000"
     depends_on:
       - postgres
+      - rabbitmq
     environment:
       SERVICE_NAME: "chat"
       SERVICE_PORT: 3000
@@ -13,12 +15,20 @@ services:
       - ./services/chat/src:/etc/chat/src
       - ./services/chat/views:/etc/chat/views
       - ./services/chat/ormconfig.json:/etc/chat/ormconfig.json
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   auth:
     build: ./services/auth
+    restart: always
     ports:
       - "5001:3000"
     depends_on:
       - postgres
+      - rabbitmq
     environment:
       SERVICE_NAME: "auth"
       SERVICE_PORT: 3000
@@ -26,8 +36,15 @@ services:
       - ./services/auth/src:/etc/auth/src
       - ./services/auth/views:/etc/auth/views
       - ./services/auth/ormconfig.json:/etc/auth/ormconfig.json
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/ || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+
   logging:
     build: ./services/logging
+    restart: always
     ports:
       - "5002:3000"
     depends_on:
@@ -37,11 +54,13 @@ services:
       SERVICE_PORT: 3000
     volumes:
       - ./services/logging/src:/etc/logging/src
+
   redis:
     image: "redis:alpine"
 
   postgres:
     image: "postgres:9.6.1"
+    restart: always
     ports:
       - "5432:5432"
     environment:
@@ -54,6 +73,7 @@ services:
     # This variant is built on Alpine Linux (it's smaller) and includes
     # the management UI.
     image: "rabbitmq:3.6-management-alpine"
+    restart: always
 
     # These ports are exposed on the host; 'hostport:containerport'.
     # You could connect to this server from outside with the *host's*
@@ -67,3 +87,10 @@ services:
       - "5672:5672"
       # HTTP management UI
       - "15672:15672"
+  autoheal:
+    image: "willfarrell/autoheal"
+    restart: always
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

@@ -10,6 +10,14 @@ import * as amqp from "amqplib";
 
 const exphbs = require("express-handlebars");
 
+process.on("exit", () => console.log("Now we exiting"));
+
+setInterval(() => console.log("piip"), 5000);
+
+setTimeout(() => {
+  process.exit(22);
+}, 15000);
+
 createConnection()
   .then(async connection => {
     /* RABBIT MQ MESSAGE PUBLISH */
@@ -17,7 +25,7 @@ createConnection()
 
     const channel = await rabbitmqConnection.createChannel();
     var queue = "logging";
-    var msg = "logginservice started";
+    var msg = "logginservice started now";
 
     channel.assertQueue(queue, {
       durable: false
