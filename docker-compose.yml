@@ -2,7 +2,7 @@ version: "3.7"
 services:
   chat:
     build: ./services/chat
-    restart: always
+    #restart: always
     ports:
       - "5000:3000"
     depends_on:
@@ -16,14 +16,13 @@ services:
       - ./services/chat/views:/etc/chat/views
       - ./services/chat/ormconfig.json:/etc/chat/ormconfig.json
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/ || exit 1"]
+      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
-
   auth:
     build: ./services/auth
-    restart: always
+    #restart: always
     ports:
       - "5001:3000"
     depends_on:
@@ -37,7 +36,7 @@ services:
       - ./services/auth/views:/etc/auth/views
       - ./services/auth/ormconfig.json:/etc/auth/ormconfig.json
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/ || exit 1"]
+      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/"]
       interval: 5s
       timeout: 10s
       retries: 3
@@ -60,20 +59,21 @@ services:
 
   postgres:
     image: "postgres:9.6.1"
-    restart: always
+    #restart: always
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: "test"
       POSTGRES_PASSWORD: "test"
       POSTGRES_DB: "test"
+
   rabbitmq:
     # There is a prebuilt RabbitMQ image; see
     # https://hub.docker.com/_/rabbitmq/ for details.
     # This variant is built on Alpine Linux (it's smaller) and includes
     # the management UI.
     image: "rabbitmq:3.6-management-alpine"
-    restart: always
+    #restart: always
 
     # These ports are exposed on the host; 'hostport:containerport'.
     # You could connect to this server from outside with the *host's*
@@ -87,10 +87,10 @@ services:
       - "5672:5672"
       # HTTP management UI
       - "15672:15672"
-  autoheal:
-    image: "willfarrell/autoheal"
-    restart: always
-    environment:
-      - AUTOHEAL_CONTAINER_LABEL=all
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+  #autoheal:
+  #image: "willfarrell/autoheal"
+  #restart: always
+  #environment:
+  #- AUTOHEAL_CONTAINER_LABEL=all
+  #volumes:
+  #- /var/run/docker.sock:/var/run/docker.sock

@@ -41,6 +41,15 @@ createConnection()
       })
     );
 
+    app.get("/test-receiver", (req: Request, res: Response, next: Function) => {
+      console.log(
+        `${new Date().toISOString()} test: ${req.query.test} - req #${
+          req.query.requestNumber
+        }`
+      );
+      res.sendStatus(200);
+    });
+
     app.get("/login", (req: Request, res: Response, next: Function) => {
       if ((req as any).session.user) {
         next();
@@ -99,7 +108,7 @@ createConnection()
     });
 
     // Do web socket magic here
-    io.on("connection", socket => {
+    io.on("connection", async socket => {
       const name = socket.handshake.query.name;
       const userId = socket.handshake.query.userId;
       console.log(`${userId} of ${name}  connected`);

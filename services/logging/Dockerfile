@@ -7,6 +7,4 @@ COPY . .
 
 RUN npm install
 
-HEALTHCHECK CMD curl --fail http://localhost:5000/ || exit 1
-
 CMD ["nodemon",  "src/index.js"]

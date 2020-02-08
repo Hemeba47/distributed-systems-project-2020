@@ -7,16 +7,18 @@ import { Routes } from "./routes";
 import { User } from "./entity/User";
 import * as bcrypt from "bcryptjs";
 import * as amqp from "amqplib";
+import axios from "axios";
 
 const exphbs = require("express-handlebars");
 
+/*
 process.on("exit", () => console.log("Now we exiting"));
-
 setInterval(() => console.log("piip"), 5000);
 
 setTimeout(() => {
   process.exit(22);
 }, 15000);
+*/
 
 createConnection()
   .then(async connection => {
@@ -108,6 +110,26 @@ createConnection()
       (req as any).session.user = loggedInUser;
       return res.render("profile.hbs", {
         ...(req as any).session.user
+      });
+    });
+
+    app.post("/run-tests", async (req, res) => {
+      const reqCount = Number(req.query.requestCount) || 30;
+      const range = [...Array(reqCount).keys()];
+      const testName = req.query.testName || "default-test";
+      const t0 = new Date();
+      const d = await Promise.all(
+        range.map(i => {
+          return axios.get(
+            `http://chat:3000/test-receiver?test=${testName}&requestNumber=${i}`
+          );
+        })
+      );
+      const t1 = new Date();
+      return res.json({
+        msg: `ran ${reqCount} requests in time t0 - t1`,
+        t0,
+        t1
       });
     });
 
