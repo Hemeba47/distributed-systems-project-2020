@@ -24,10 +24,9 @@ createConnection()
   .then(async connection => {
     /* RABBIT MQ MESSAGE PUBLISH */
     const rabbitmqConnection = await amqp.connect("amqp://rabbitmq");
-
     const channel = await rabbitmqConnection.createChannel();
     var queue = "logging";
-    var msg = "logginservice started now";
+    var msg = "Authorization service started now";
 
     channel.assertQueue(queue, {
       durable: false
