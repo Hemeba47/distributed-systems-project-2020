@@ -52,8 +52,12 @@ services:
     environment:
       SERVICE_NAME: 'logging'
       SERVICE_PORT: 3000
+      LOGPATH: '/etc/logs'
+      LOGFILE: 'SYSTEM_LOG.log'
     volumes:
       - ./services/logging/src:/etc/logging/src
+      # mount logs folder to the loggin service
+      - ./logs:/etc/logs
 
   redis:
     image: 'redis:alpine'
