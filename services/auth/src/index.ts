@@ -11,15 +11,6 @@ import axios from "axios";
 
 const exphbs = require("express-handlebars");
 
-/*
-process.on("exit", () => console.log("Now we exiting"));
-setInterval(() => console.log("piip"), 5000);
-
-setTimeout(() => {
-  process.exit(22);
-}, 15000);
-*/
-
 createConnection()
   .then(async connection => {
     /* RABBIT MQ MESSAGE PUBLISH */
@@ -56,26 +47,33 @@ createConnection()
       });
 
       if (user) {
+        /**
+         * Log user in if the password hashes match
+         */
         const pwOk = bcrypt.compareSync(req.body.password, user.password);
 
-        console.log(pwOk);
-
         if (!pwOk) {
+          /**
+           * If not just return 401
+           */
           return res.sendStatus(401);
         }
 
+        /**
+         * Encode user to the URI for passing the
+         * user info for the service that the client
+         * is being redirected to
+         */
+        const uriEncodedUser = encodeURIComponent(JSON.stringify(user));
+
         if (req.body.service === "chat") {
           return res.redirect(
-            `http://localhost:5000/login-success?user=${encodeURIComponent(
-              JSON.stringify(user)
-            )}`
+            `http://localhost:5000/login-success?user=${uriEncodedUser}`
           );
         }
         if (req.body.service === "profile") {
           return res.redirect(
-            `http://localhost:5000/login-success?user=${encodeURIComponent(
-              JSON.stringify(user)
-            )}`
+            `http://localhost:5001/profile?user=${uriEncodedUser}`
           );
         }
       }
@@ -90,14 +88,20 @@ createConnection()
     app.post(
       "/register",
       async (req: Request, res: Response, next: Function) => {
-        console.log(req.body);
         try {
           const user = new User({
             ...req.body,
             password: bcrypt.hashSync(req.body.password, 8)
           });
-          const savedUser = await getRepository(User).save(user);
-          return res.json(savedUser);
+          const { password, ...savedUser } = await getRepository(User).save(
+            user
+          );
+          console.log(savedUser);
+          const redirectUrl = `/profile?user=${encodeURIComponent(
+            JSON.stringify(savedUser)
+          )}`;
+          console.log(redirectUrl);
+          return res.redirect(redirectUrl);
         } catch (err) {
           console.log(err);
           return res.sendStatus(400);
@@ -105,18 +109,32 @@ createConnection()
       }
     );
 
+    /**
+     * Render the logged in users information
+     */
     app.get("/profile", (req: Request, res: Response, next: Function) => {
       const loggedInUser = JSON.parse(req.query.user);
-      (req as any).session.user = loggedInUser;
+      //(req as any).session.user = loggedInUser;
       return res.render("profile.hbs", {
-        ...(req as any).session.user
+        userURIComponent: encodeURIComponent(JSON.stringify(loggedInUser)),
+        ...loggedInUser
       });
     });
 
+    /**
+     * Run a test to see how long it takes to
+     * send N amount of requests between nodes
+     */
     app.post("/run-tests", async (req, res) => {
+      // if requestCount provided with the initiating
+      // request use that, if not use 30 as default
       const reqCount = Number(req.query.requestCount) || 30;
+      // create range [0...reqCount]
       const range = [...Array(reqCount).keys()];
+      // if testName provided with the initiating
+      // request use that, if not use "default-test" as default
       const testName = req.query.testName || "default-test";
+      // keep track how long it took to send all N requests
       const t0 = new Date();
       const d = await Promise.all(
         range.map(i => {
@@ -125,7 +143,9 @@ createConnection()
           );
         })
       );
+      // time after the requests were sent
       const t1 = new Date();
+      // return info about the test to the client
       return res.json({
         msg: `ran ${reqCount} requests in time t0 - t1`,
         t0,

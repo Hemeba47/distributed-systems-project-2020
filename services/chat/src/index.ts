@@ -69,7 +69,6 @@ createConnection()
 
     app.get("/", async (req: Request, res: Response, next: Function) => {
       const user = (req as any).session.user;
-      console.log(user);
       const notes = await getRepository(Note).find({
         userId: (req as any).session.user.id
       });
@@ -88,11 +87,15 @@ createConnection()
     app.get(
       "/login-success",
       async (req: Request, res: Response, next: Function) => {
-        const loggedInUser = JSON.parse(req.query.user);
-        (req as any).session.user = loggedInUser;
-        return res.render("home.hbs", {
-          ...(req as any).session.user
-        });
+        try {
+          const loggedInUser = JSON.parse(req.query.user);
+          (req as any).session.user = loggedInUser;
+          return res.render("home.hbs", {
+            ...(req as any).session.user
+          });
+        } catch (err) {
+          res.redirect("/logout");
+        }
       }
     );
 

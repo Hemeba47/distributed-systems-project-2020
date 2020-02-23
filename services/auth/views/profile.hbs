@@ -11,25 +11,22 @@
     }
 </style>
 <html>
-<nav>
+<div>
+    <h1>You logged in as</h1>
     <ul>
-        <li><a href="/login">LOGIN</a></li>
+
+        <li>{{firstName}}
+            {{lastName}}
+        </li>
+        <li>
+            {{email}}
+        </li>
     </ul>
-</nav>
-<h1>Login Service</h1>
-<form method="POST" action="http://localhost:5001/register">
-    <label for="firstName">first name</label>
-    <input name="firstName" id="firstName" value="" type="text" />
-    <label for="lastName">last name</label>
-    <input name="lastName" id="lastName" value="" type="text" />
-    <label for="email">email</label>
-    <input name="email" id="email" value="" type="email" />
-    <label for="password">password</label>
-    <input name="password" id="password" type="password" value="" />
-    <label for="service">service</label>
-    <button type="submit">login</button>
-</form>
+    <h2>Continue to the service</h2>
+    <a href="http://localhost:5000/login-success?user={{userURIComponent}}">Chat</a>
 
 </div>
+
+
 
 </html>
