@@ -33,9 +33,9 @@ amqp.connect('amqp://rabbitmq', function(error0, connection) {
       fs.appendFile('message-log.txt', msg.content, (error2) => {
         if (error2) throw error2;
         console.log('The file was appended!');
-      //his appendFileSync neither
+      });
+      //This appendFileSync neither
       fs.appendFileSync("message-log.txt", msg.content);
-});
     });
   });
 });
