@@ -5,6 +5,7 @@ import * as session from "express-session";
 import { Request, Response } from "express";
 import * as redis from "redis";
 import { Message } from "./entity/Message";
+import * as amqp from "amqplib";
 
 const exphbs = require("express-handlebars");
 const RedisStore = require("connect-redis")(session);
@@ -24,8 +25,18 @@ declare global {
 
 createConnection()
   .then(async connection => {
-    // create express app
+    /* RABBIT MQ MESSAGE PUBLISH */
+    const rabbitmqConnection = await amqp.connect("amqp://rabbitmq");
+    const channel = await rabbitmqConnection.createChannel();
+    var queue = "logging";
+    var msg = "Chatservice started now";
 
+    channel.assertQueue(queue, {
+      durable: false
+    });
+    channel.sendToQueue(queue, Buffer.from(msg));
+
+    // create express app
     app.engine("handlebars", exphbs());
     app.set("view engine", "handlebars");
     app.use(bodyParser.json());
@@ -122,7 +133,11 @@ createConnection()
 
       socket.on("chat", async function(msg) {
         console.log("message: " + msg);
+        
         console.log("here we would save the message aswell ");
+        //sends the message to distributed logging service
+        channel.sendToQueue(queue, Buffer.from(msg));
+
         io.emit("chat", `${new Date().toUTCString()}::${name}: ${msg}`);
 
         const notSavedMessage = new Message();
