@@ -1,22 +1,22 @@
-version: "3.7"
+version: '3.7'
 services:
   chat:
     build: ./services/chat
     #restart: always
     ports:
-      - "5000:3000"
+      - '5000:3000'
     depends_on:
       - postgres
       - rabbitmq
     environment:
-      SERVICE_NAME: "chat"
+      SERVICE_NAME: 'chat'
       SERVICE_PORT: 3000
     volumes:
       - ./services/chat/src:/etc/chat/src
       - ./services/chat/views:/etc/chat/views
       - ./services/chat/ormconfig.json:/etc/chat/ormconfig.json
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/"]
+      test: ['CMD-SHELL', 'curl -f -s http://localhost:3000/']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -24,19 +24,19 @@ services:
     build: ./services/auth
     #restart: always
     ports:
-      - "5001:3000"
+      - '5001:3000'
     depends_on:
       - postgres
       - rabbitmq
     environment:
-      SERVICE_NAME: "auth"
+      SERVICE_NAME: 'auth'
       SERVICE_PORT: 3000
     volumes:
       - ./services/auth/src:/etc/auth/src
       - ./services/auth/views:/etc/auth/views
       - ./services/auth/ormconfig.json:/etc/auth/ormconfig.json
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -s http://localhost:3000/"]
+      test: ['CMD-SHELL', 'curl -f -s http://localhost:3000/']
       interval: 5s
       timeout: 10s
       retries: 3
@@ -45,34 +45,35 @@ services:
     build: ./services/logging
     restart: always
     ports:
-      - "5002:3000"
+      - '5002:3000'
     depends_on:
       - postgres
+      - rabbitmq
     environment:
-      SERVICE_NAME: "logging"
+      SERVICE_NAME: 'logging'
       SERVICE_PORT: 3000
     volumes:
       - ./services/logging/src:/etc/logging/src
 
   redis:
-    image: "redis:alpine"
+    image: 'redis:alpine'
 
   postgres:
-    image: "postgres:9.6.1"
+    image: 'postgres:9.6.1'
     #restart: always
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
-      POSTGRES_USER: "test"
-      POSTGRES_PASSWORD: "test"
-      POSTGRES_DB: "test"
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'test'
 
   rabbitmq:
     # There is a prebuilt RabbitMQ image; see
     # https://hub.docker.com/_/rabbitmq/ for details.
     # This variant is built on Alpine Linux (it's smaller) and includes
     # the management UI.
-    image: "rabbitmq:3.6-management-alpine"
+    image: 'rabbitmq:3.6-management-alpine'
     #restart: always
 
     # These ports are exposed on the host; 'hostport:containerport'.
@@ -84,9 +85,9 @@ services:
     # password: guest
     ports:
       # The standard AMQP protocol port
-      - "5672:5672"
+      - '5672:5672'
       # HTTP management UI
-      - "15672:15672"
+      - '15672:15672'
   #autoheal:
   #image: "willfarrell/autoheal"
   #restart: always
